@@ -1,11 +1,6 @@
 {% set name = "cccl-python" %}
 {% set version = "1.0.0" %}
-
-{% if cuda_compiler_version in (None, "None", True, False) %}
-{% set cuda_major_version = 0 %}
-{% else %}
 {% set cuda_major_version = environ.get("cuda_compiler_version", "12.9").split(".")[0] | int %}
-{% endif %}
 
 package:
   name: {{ name|lower }}
@@ -31,56 +26,57 @@ build:
     - set "CUDAARCHS=75"  # [win]
     - {{ PYTHON }} -m pip install python/cuda_cccl -vv --no-deps --no-build-isolation
   number: 0
-  string: cuda{{ cuda_major_version }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}  # [cuda_compiler_version != "None"]
-  skip: true  # [(py < 39) or cuda_compiler_version not in ("12.9","13.0") or ppc64le]
+  string: cuda{{ cuda_major_version }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
+  skip: true  # [(py < 39) or cuda_compiler_version not in ("12.9","13.0")]
   ignore_run_exports_from:
     - {{ compiler('cuda') }}
     - cuda-nvrtc-dev
     - libnvjitlink-dev
     - cuda-driver-dev  # [linux]
   missing_dso_whitelist:
+    # Needed DSO by 'libcccl.c.parallel.so'
     - "*/libcuda.so.1"  # [linux]
-    - "*/nvcuda.dll"  # [win]
     # this is dynamically loaded at run time
     - "*/cccl.c.parallel.dll"  # [win]
 
 requirements:
   build:
+    - {{ stdlib('c') }}
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - {{ compiler('cuda') }}
-    - {{ stdlib('c') }}
     - cmake
-    - ninja
-    - cross-python_{{ target_platform }}    # [build_platform != target_platform]
-    - python                                # [build_platform != target_platform]
-    - cython                                # [build_platform != target_platform]
-    - scikit-build-core >=0.10              # [build_platform != target_platform]
-    - setuptools-scm                        # [build_platform != target_platform]
+    - ninja-base
   host:
+    - python
+    - pip
+    - setuptools-scm
+    - cython
+    - scikit-build-core >=0.10
     - cuda-version {{ cuda_compiler_version }}
     - cuda-nvrtc-dev
     - libnvjitlink-dev
     - cuda-driver-dev  # [linux]
-    - python
-    - cython
-    - scikit-build-core >=0.10
-    - setuptools-scm
-    - pip
   run:
-    - {{ pin_compatible("cuda-version", min_pin="x") }}
     - python
-    - numba >=0.60.0
     - numpy
+    - numba >=0.60.0
+    - numba-cuda >=0.23.0,<0.27.0a0
     - cuda-pathfinder >=1.2.3,<2.0.0a0
     - cuda-core
-    - numba-cuda >=0.23.0
+    - typing-extensions
+    - {{ pin_compatible("cuda-version", min_pin="x") }}
     - {{ pin_compatible('cuda-nvrtc', min_pin='x', max_pin='x') }}
     - {{ pin_compatible('libnvjitlink', min_pin='x', max_pin='x') }}
   run_constrained:
+    # We need a GPU to run cccl-python
     - __cuda >=12.0
 
 test:
+  requires:
+    - pip
+  commands:
+    - pip check
   imports:
     - cuda.compute
     - cuda.coop._experimental
@@ -91,6 +87,7 @@ about:
   description: 'Python interfaces to CUDA Core Compute Libraries (CCCL)'
   license: LicenseRef-NVIDIA-SOFTWARE-LICENSE
   license_file: LICENSE
+  license_family: Other
   # The doc_url and dev_url are optional.
   doc_url: https://nvidia.github.io/cccl/python/
   dev_url: https://github.com/NVIDIA/cccl
