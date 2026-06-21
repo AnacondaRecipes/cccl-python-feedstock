@@ -45,7 +45,7 @@ requirements:
     - {{ compiler('c') }}
     - {{ compiler('cxx') }}
     - {{ compiler('cuda') }}
-    - cmake
+    - cmake >=3.30
     - ninja-base
   host:
     - python
