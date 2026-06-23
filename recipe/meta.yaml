@@ -13,6 +13,7 @@ source:
     - 0001-Include-memory-in-for_op_helper.h.patch
 
 build:
+  number: 1
   script_env:
     - SETUPTOOLS_SCM_PRETEND_VERSION={{ version }}
   script:
@@ -25,7 +26,6 @@ build:
     - set "CUDA_PATH=%PREFIX%\Library"  # [win]
     - set "CUDAARCHS=75"  # [win]
     - {{ PYTHON }} -m pip install python/cuda_cccl -vv --no-deps --no-build-isolation
-  number: 0
   string: cuda{{ cuda_major_version }}_py{{ CONDA_PY }}h{{ PKG_HASH }}_{{ PKG_BUILDNUM }}
   skip: true  # [(py < 39) or cuda_compiler_version not in ("12.9","13.0")]
   ignore_run_exports_from:
@@ -61,7 +61,7 @@ requirements:
     - python
     - numpy
     - numba >=0.60.0
-    - numba-cuda >=0.23.0,<0.27.0a0
+    - numba-cuda >=0.23.0
     - cuda-pathfinder >=1.2.3,<2.0.0a0
     - cuda-core
     - typing-extensions

@@ -1,0 +1,8 @@
+anaconda_config_version: 1
+upstream_sources:
+  - github:
+      identifier: NVIDIA/cccl
+      use_max_tag: true
+      include_regex: ^python-\d+\.\d+\.\d+$
+      from_pattern: ^python-(.+)$
+      to_pattern: \1
