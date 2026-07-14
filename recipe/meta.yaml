@@ -1,5 +1,5 @@
 {% set name = "cccl-python" %}
-{% set version = "1.0.2" %}
+{% set version = "1.1.0" %}
 {% set cuda_major_version = environ.get("cuda_compiler_version", "12.9").split(".")[0] | int %}
 
 package:
@@ -8,12 +8,12 @@ package:
 
 source:
   url: https://github.com/NVIDIA/cccl/archive/refs/tags/python-{{ version }}.tar.gz
-  sha256: b847eac18432b76f77afc89a8fe0b65ca24dc575a65ce03f0196a1bc16bf224a
+  sha256: f5b183f9fc9e8512b75a7d0bdf9d5e65743520a84ee311c809dc767da3243a27
   patches:
     - 0001-Include-memory-in-for_op_helper.h.patch
 
 build:
-  number: 1
+  number: 0
   script_env:
     - SETUPTOOLS_SCM_PRETEND_VERSION={{ version }}
   script:
@@ -21,7 +21,7 @@ build:
     - export CMAKE_GENERATOR=Ninja  # [linux]
     - export CUDAARCHS=75  # [linux]
     - set "CMAKE_GENERATOR=Ninja"  # [win]
-    - set "CMAKE_GENERATOR_TOOLSET="   # [win]
+    - set "CMAKE_GENERATOR_TOOLSET="  # [win]
     - set "CMAKE_GENERATOR_PLATFORM="  # [win]
     - set "CUDA_PATH=%PREFIX%\Library"  # [win]
     - set "CUDAARCHS=75"  # [win]
@@ -83,8 +83,8 @@ test:
 
 about:
   home: https://github.com/NVIDIA/cccl
-  summary: 'Python interfaces to CUDA Core Compute Libraries (CCCL)'
-  description: 'Python interfaces to CUDA Core Compute Libraries (CCCL)'
+  summary: Python interfaces to CUDA Core Compute Libraries (CCCL)
+  description: Python interfaces to CUDA Core Compute Libraries (CCCL)
   license: LicenseRef-NVIDIA-SOFTWARE-LICENSE
   license_file: LICENSE
   license_family: Other
