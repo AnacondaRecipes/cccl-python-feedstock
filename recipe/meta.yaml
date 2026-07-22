@@ -1,19 +1,19 @@
 {% set name = "cccl-python" %}
-{% set version = "1.0.2" %}
+{% set version = "1.1.1" %}
 {% set cuda_major_version = environ.get("cuda_compiler_version", "12.9").split(".")[0] | int %}
 
 package:
-  name: {{ name|lower }}
+  name: {{ name }}
   version: {{ version }}
 
 source:
   url: https://github.com/NVIDIA/cccl/archive/refs/tags/python-{{ version }}.tar.gz
-  sha256: b847eac18432b76f77afc89a8fe0b65ca24dc575a65ce03f0196a1bc16bf224a
+  sha256: 5c59470fb75df593b8df680707933ee6ee9f541d1074cfb231b8c6fd72707a51
   patches:
     - 0001-Include-memory-in-for_op_helper.h.patch
 
 build:
-  number: 1
+  number: 0
   script_env:
     - SETUPTOOLS_SCM_PRETEND_VERSION={{ version }}
   script:
@@ -60,9 +60,11 @@ requirements:
   run:
     - python
     - numpy
-    - numba >=0.60.0
+    - numba >=0.60.0,<0.66
+    # Keep this less constrained than upstream because newer
+    # numba-cude versions have been verified to work in PR #3
     - numba-cuda >=0.23.0
-    - cuda-pathfinder >=1.2.3,<2.0.0a0
+    - cuda-pathfinder >=1.2.3
     - cuda-core
     - typing-extensions
     - {{ pin_compatible("cuda-version", min_pin="x") }}
@@ -89,7 +91,7 @@ about:
   license_file: LICENSE
   license_family: Other
   # The doc_url and dev_url are optional.
-  doc_url: https://nvidia.github.io/cccl/python/
+  doc_url: https://nvidia.github.io/cccl/python
   dev_url: https://github.com/NVIDIA/cccl
 
 extra:
