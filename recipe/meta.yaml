@@ -61,6 +61,7 @@ requirements:
     - python
     - numpy
     - cuda-pathfinder >=1.2.3,<2.0.0a0
+    - cuda-bindings
     - cuda-core
     - cuda-cudart
     - typing-extensions
